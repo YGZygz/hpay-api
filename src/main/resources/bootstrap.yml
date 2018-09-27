@@ -1,0 +1,55 @@
+
+# bootstrap.yml
+spring:
+  application:
+    name: hpay-api-gateway
+  profiles:
+    active: native
+server:
+  port: 5556
+  contextPath: ''
+
+eureka:
+  instance:
+    nonSecurePort: ${server.port:8080}
+    hostname: ${HOSTNAME:localhost}
+    preferIpAddress: true
+    #Eureka客户端向服务端发送心跳的时间间隔，单位为秒（客户端告诉服务端自己会按照该规则）
+    lease-renewal-interval-in-seconds: 10
+    #Eureka服务端在收到最后一次心跳之后等待的时间上限，单位为秒，超过则剔除（客户端告诉服务端按照此规则等待自己）
+    lease-expiration-duration-in-seconds: 5
+    statusPageUrlPath: ${server.contextPath}/info
+    healthCheckUrlPath: ${server.contextPath}/health
+  client:
+#    healthcheck.enabled: true
+    serviceUrl:
+      defaultZone: http://localhost:1111/eureka/
+
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: THREAD
+          thread:
+            timeoutInMilliseconds: 180000
+
+ribbon:
+  ConnectTimeout: 10000
+  ReadTimeout: 180000
+  OKToRetryOnAllOperations: false
+
+
+#logging
+logging.config: classpath:log4j2.xml
+logging.path: logs/${spring.application.name}-${instance.num:00}
+---
+spring:
+  profiles: sit_idc
+server.port: 5556
+---
+spring:
+  profiles: prod
+server.port: 5556
+---
